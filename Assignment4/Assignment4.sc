@@ -1,6 +1,6 @@
 //Khang Nguyen Cs152
 //Q1
-def cube1(number: List[Int]) ={
+def cubeIterative(number: List[Int]) ={
   var sum = 0
   for(i <- 0 until number.size){
     if(number(i)%2 != 0){
@@ -10,28 +10,28 @@ def cube1(number: List[Int]) ={
   sum
 }
 
-def cube2(number: List[Int]): Int ={
-  if(number.isEmpty == true){
+def cubeClassical(number: List[Int]): Int ={
+  if(number.isEmpty){
     0
   }
   else{
-    if(number(0)%2 != 0) {
-      number(0) * number(0) * number(0) + cube2(number.drop(1))
+    if(number.head%2 != 0) {
+      number.head * number.head * number.head + cubeClassical(number.drop(1))
     }
     else{
-      cube2(number.drop(1))
+      cubeClassical(number.drop(1))
     }
   }
 }
 
-def cube3(number: List[Int]): Int ={
+def cubeTail(number: List[Int]): Int ={
   def helper(number: List[Int], sum: Int): Int ={
-    if(number.isEmpty == true){
+    if(number.isEmpty){
       sum
     }
     else{
-      if(number(0)%2 != 0) {
-        helper(number.drop(1), number(0) * number(0) * number(0) + sum)
+      if(number.head%2 != 0) {
+        helper(number.drop(1), number.head * number.head * number.head + sum)
       }
       else{
         helper(number.drop(1), sum)
@@ -41,18 +41,18 @@ def cube3(number: List[Int]): Int ={
   helper(number, 0)
 }
 
-def cube4(number: List[Int]): Int ={
+def cubePipeline(number: List[Int]): Int ={
   number.map(x => x*x*x).filter(x => x%2 != 0).reduce((x, y) => x + y)
 }
 
 val cube = List(1, 1, 2, 3, 5)
-cube1(cube)
-cube2(cube)
-cube3(cube)
-cube4(cube)
+cubeIterative(cube)
+cubeClassical(cube)
+cubeTail(cube)
+cubePipeline(cube)
 
 //Q2
-def sumOfSums1(number: List[List[Int]]): Int = {
+def sumOfSumsIterative(number: List[List[Int]]): Int = {
   var combinedList = number(0)
   var sum = 0
   for(i <- 1 until number.size){
@@ -64,54 +64,53 @@ def sumOfSums1(number: List[List[Int]]): Int = {
   sum
 }
 
-def sumOfSums2(number: List[List[Int]]): Int = {
+def sumOfSumsClassical(number: List[List[Int]]): Int = {
+  if(number.isEmpty){
+    0
+  }
+  else{
+    if(number.head.isEmpty){
+      sumOfSumsClassical(number.drop(1))
+    }
+    else{
+      val newFirstList = List(number.head.drop(1))
+      val newNumber = newFirstList ++ number.drop(1)
+      number.head.head + sumOfSumsClassical(newNumber)
+    }
+  }
+}
+
+def sumOfSumsTail(number: List[List[Int]]): Int = {
   def helper(number: List[List[Int]], sum: Int): Int = {
     if (number.isEmpty) {
       sum
     }
     else {
-      if (number(0).isEmpty) {
+      if (number.head.isEmpty) {
         helper(number.drop(1), sum)
       }
       else {
-        val newFirstList = List(number(0).drop(1))
+        val newFirstList = List(number.head.drop(1))
         val newNumber = newFirstList ++ number.drop(1)
-        helper(newNumber, sum + number(0)(0))
+        helper(newNumber, sum + number.head.head)
       }
     }
   }
   helper(number, 0)
 }
 
-
-def sumOfSums3(number: List[List[Int]]): Int = {
-  if(number.isEmpty){
-    0
-  }
-  else{
-    if(number(0).isEmpty){
-      sumOfSums2(number.drop(1))
-    }
-    else{
-      val newFirstList = List(number(0).drop(1))
-      val newNumber = newFirstList ++ number.drop(1)
-      number(0)(0) + sumOfSums2(newNumber)
-    }
-  }
-}
-
-def sumOfSums4(number: List[List[Int]]): Int = {
+def sumOfSumsPipeline(number: List[List[Int]]): Int = {
   number.flatten.reduce((x,y)=> x + y)
 }
 
-sumOfSums1(List(List(1, 2, 3), List(4, 5, 6)))
-sumOfSums2(List(List(1, 2, 3), List(4, 5, 6)))
-sumOfSums3(List(List(1, 2, 3), List(4, 5, 6)))
-sumOfSums4(List(List(1, 2, 3), List(4, 5, 6)))
+sumOfSumsIterative(List(List(1, 2, 3), List(4, 5, 6)))
+sumOfSumsClassical(List(List(1, 2, 3), List(4, 5, 6)))
+sumOfSumsTail(List(List(1, 2, 3), List(4, 5, 6)))
+sumOfSumsPipeline(List(List(1, 2, 3), List(4, 5, 6)))
 
 //Q6
 def isEven(number : Int) = if(number % 2 == 0) true else false
-def predicateCount1[T](list : List[T], predicate: T=>Boolean): Int ={
+def predicateCountIterative[T](list : List[T], predicate: T=>Boolean): Int ={
   var count = 0
   for(i <- 0 until list.size) {
     if (predicate(list(i))) count = count + 1
@@ -119,14 +118,14 @@ def predicateCount1[T](list : List[T], predicate: T=>Boolean): Int ={
   count
 }
 
-def predicateCount2[T](list : List[T], predicate: T=>Boolean): Int ={
+def predicateCountClassical[T](list : List[T], predicate: T=>Boolean): Int ={
   if(list.isEmpty) 0
   else{
-    if(predicate(list(0))) 1 + predicateCount1(list.drop(1), predicate) else predicateCount1(list.drop(1), predicate)
+    if(predicate(list(0))) 1 + predicateCountClassical(list.drop(1), predicate) else predicateCountClassical(list.drop(1), predicate)
   }
 }
 
-def predicateCount3[T](list : List[T], predicate: T=>Boolean): Int ={
+def predicateCountTail[T](list : List[T], predicate: T=>Boolean): Int ={
   def helper[T](list : List[T], predicate: T=>Boolean, count : Int): Int ={
     if(list.isEmpty) count
     else{
@@ -136,16 +135,16 @@ def predicateCount3[T](list : List[T], predicate: T=>Boolean): Int ={
   helper(list, predicate , 0)
 }
 
-def predicateCount4[T](list : List[T], predicate: T=>Boolean): Int ={
+def predicateCountPipeline[T](list : List[T], predicate: T=>Boolean): Int ={
   list.filter(predicate).length
 }
-predicateCount1(List(1, 2, 3, 5, 8, 12, 14, 16), isEven)
-predicateCount2(List(1, 2, 3, 5, 8, 12, 14, 16), isEven)
-predicateCount3(List(1, 2, 3, 5, 8, 12, 14, 16), isEven)
-predicateCount4(List(1, 2, 3, 5, 8, 12, 14, 16), isEven)
+predicateCountIterative(List(1, 2, 3, 5, 8, 12, 14, 16), isEven)
+predicateCountClassical(List(1, 2, 3, 5, 8, 12, 14, 16), isEven)
+predicateCountTail(List(1, 2, 3, 5, 8, 12, 14, 16), isEven)
+predicateCountPipeline(List(1, 2, 3, 5, 8, 12, 14, 16), isEven)
 
 //Q7
-def predicateAll1[T](list : List[T], predicate: T=>Boolean): Boolean = {
+def predicateAllIterative[T](list : List[T], predicate: T=>Boolean): Boolean = {
   var result = true
   for (i <- 0 until list.size) {
     if (predicate(list(i)) == false) result = false
@@ -153,16 +152,16 @@ def predicateAll1[T](list : List[T], predicate: T=>Boolean): Boolean = {
   result
 }
 
-def predicateAll2[T](list : List[T], predicate: T=>Boolean): Boolean = {
+def predicateAllClassical[T](list : List[T], predicate: T=>Boolean): Boolean = {
   if(list.isEmpty){
     true
   }
   else {
-    if (predicate(list(0))) true && predicateAll2(list.drop(1), predicate) else false && predicateAll2(list.drop(1), predicate)
+    if (predicate(list(0))) true && predicateAllClassical(list.drop(1), predicate) else false && predicateAllClassical(list.drop(1), predicate)
   }
 }
 
-def predicateAll3[T](list : List[T], predicate: T=>Boolean): Boolean = {
+def predicateAllTail[T](list : List[T], predicate: T=>Boolean): Boolean = {
   def helper[T](list : List[T], predicate: T=>Boolean, result: Boolean): Boolean ={
     if(list.isEmpty){
       result
@@ -174,17 +173,17 @@ def predicateAll3[T](list : List[T], predicate: T=>Boolean): Boolean = {
   helper(list, predicate, true)
 }
 
-def predicateAll4[T](list : List[T], predicate: T=>Boolean): Boolean = {
+def predicateAllPipeline[T](list : List[T], predicate: T=>Boolean): Boolean = {
   list.filter(predicate).size == list.size
 }
-predicateAll1(List(1, 2, 3, 5, 8, 12, 14, 16), isEven)
-predicateAll1(List(2, 8, 12, 14, 16), isEven)
-predicateAll2(List(1, 2, 3, 5, 8, 12, 14, 16), isEven)
-predicateAll2(List(2, 8, 12, 14, 16), isEven)
-predicateAll3(List(1, 2, 3, 5, 8, 12, 14, 16), isEven)
-predicateAll3(List(2, 8, 12, 14, 16), isEven)
-predicateAll4(List(1, 2, 3, 5, 8, 12, 14, 16), isEven)
-predicateAll4(List(2, 8, 12, 14, 16), isEven)
+predicateAllIterative(List(1, 2, 3, 5, 8, 12, 14, 16), isEven)
+predicateAllIterative(List(2, 8, 12, 14, 16), isEven)
+predicateAllClassical(List(1, 2, 3, 5, 8, 12, 14, 16), isEven)
+predicateAllClassical(List(2, 8, 12, 14, 16), isEven)
+predicateAllTail(List(1, 2, 3, 5, 8, 12, 14, 16), isEven)
+predicateAllTail(List(2, 8, 12, 14, 16), isEven)
+predicateAllPipeline(List(1, 2, 3, 5, 8, 12, 14, 16), isEven)
+predicateAllPipeline(List(2, 8, 12, 14, 16), isEven)
 
 //Q13
 def longListOf1From(): LazyList[Int] = 1 #:: longListOf1From()
@@ -204,20 +203,23 @@ val listOfSquares = listOfSquaresFrom(1).take(7)
 listOfSquares.toList
 
 //Q15
-def spellCheck1(doc: List[String], dictionary: List[String]): List[String] = {
+def spellCheckIteratvie(doc: List[String], dictionary: List[String]): List[String] = {
   var mispelled = List[String]()
   for(i <- 0 until doc.size){
-    if(!dictionary.contains(doc(i))) mispelled = doc(i) :: mispelled
+    if(!dictionary.contains(doc(i))) {
+      if(!mispelled.contains(doc(i))) mispelled = doc(i) :: mispelled
+    }
   }
   mispelled
 }
-spellCheck1(List("Khang", "Nguyen", "Hello", "World"), List("Khang", "World"))
+spellCheckIteratvie(List("Khang", "Nguyen", "Hello", "Hello", "World"), List("Khang", "World"))
 
-def spellCheck2(doc: List[String], dictionary: List[String]): List[String] = {
-  doc.filter(x => !dictionary.contains(x))
+def spellCheckPipeline(doc: List[String], dictionary: List[String]): List[String] = {
+  val mispelled = doc.filter(x => !dictionary.contains(x))
+  mispelled.toSet.toList
 }
 
-spellCheck2(List("Khang", "Nguyen", "Hello", "World"), List("Khang", "World"))
+spellCheckPipeline(List("Khang", "Nguyen", "Hello", "Hello", "World"), List("Khang", "World"))
 
 //Q16
 def evalMono(mono: (Double, Double), x: Double): Double = {
